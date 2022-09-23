@@ -1,0 +1,59 @@
+---
+title: 'Predicting House Prices'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Kaggle Competition
+[This Kaggle competition](https://www.kaggle.com/c/house-prices-advanced-regression-techniques/overview) is about predicting house prices based on a set of around 80 predictor variables. Please read the brief description of the project and get familiar with the various predictors. We will have to do some initial cleaning to successfully work with these data. Overall, we (in teams) will use the provided training dataset to built a multiple linear regression model for predicting house prices. Once we have settled on a final model, we will use it with the predictors available in the testing dataset to predict house prices. The goal of the competition mentions that our predictions $\hat{y}_i$ for the houses in the testing data are compared to the (withheld) true selling prices $y_i^\text{test}$ via $\sum_i(\log \hat{y}_i - \log y_i^\text{test})^2$. Because selling prices are typically right-skewed, I think as a first step we will log-transform the selling prices of the houses in the training data to obtain a more bell-shaped distribution. However, although we will built a model for the log-prices, we will still have to submit the price of a house (and not the log-price) to Kaggle, together with the ID of the house.
+
+## Loading and inspecting the train and test datasets
+
+```{r}
+library(tidyverse)
+## Load Training Data
+path_traindata <- 'https://raw.githubusercontent.com/bklingen/Price-Prediction/main/train.csv'
+train <- read_csv(path_traindata)
+dim(train)
+## Load Testing Data
+path_testdata <- 'https://raw.githubusercontent.com/bklingen/Price-Prediction/main/test.csv'
+test <- read_csv(path_testdata)
+dim(test)
+```
+
+This makes sense: We have one less column in test data becasue of the missing house prices.
+
+But, are the column names the same? Let's find the "difference" between two sets: All the column names that are in the test data but not in the train data: 
+```{r}
+setdiff(colnames(test), colnames(train))
+```
+OK, good, and now the other way around:
+```{r}
+setdiff(colnames(train), colnames(test))
+```
+OK, great. So no surprises there. All predictors that exist in the train data set also appear in the test dataset.
+
+Let's see how many quantitative and how many categorical predictors we have in the training dataset, at least at face value:
+```{r}
+train_quantPredictors = train %>% select(where(is.numeric)) %>% select(-SalePrice) 
+train_catPredictors = train %>% select(where(is.character))
+dim(train_quantPredictors)
+dim(train_catPredictors)
+```
+Let's transform the categorical predictors into factors, which should make it easier to combine categories, create a category like "other", etc. 
+```{r}
+train_catPredictors = train_catPredictors %>% transmute_all(as.factor) 
+```
+
+First, let's see the category names and frequency for each variable:
+```{r}
+for(i in 1:ncol(train_catPredictors)) {
+  print(colnames(train_catPredictors)[i])
+  print("----")
+  print(as.data.frame(fct_count(unlist(train_catPredictors[,i]))))
+  print("--------------")
+}
+```
