@@ -1,5 +1,9 @@
 Which students work on which variable:
 
-Marina: YearBuilt, GarageYrBlt, GarageCars, GarageArea
+[DONE] Marina: YearBuilt, GarageYrBlt, GarageCars, GarageArea
+  Changes:
+    1. YearBuilt and GarageYrBlt were highly correlated so GarageYrBlt column has been removed
+    2. GarageCars and GarageArea were highly correlated so GarageCars column has been removed
+
 Bernhard: ...
 Richard: ...
