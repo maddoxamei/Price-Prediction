@@ -4,6 +4,8 @@ Which students work on which variable:
   Changes:
     1. YearBuilt and GarageYrBlt were highly correlated so GarageYrBlt column has been removed
     2. GarageCars and GarageArea were highly correlated so GarageCars column has been removed
+    
+Mei: MSZoning, MSSubClass, Condition1/Condition2
 
 Deniz: Street (graved:6, paved:1454),
        Alley (graved:50, paved:41, NA:1369),
